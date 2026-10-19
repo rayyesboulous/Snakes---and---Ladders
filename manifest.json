@@ -1,0 +1,15 @@
+{
+  "name": "Snakes & Ladders",
+  "short_name": "Snakes & Ladders",
+  "start_url": "/Snakes---and---Ladders/",
+  "display": "standalone",
+  "background_color": "#262322",
+  "theme_color": "#262322",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3408/3408595.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
