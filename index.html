@@ -1,17 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#202124" media="(prefers-color-scheme: dark)">
-<meta name="theme-color" content="#f8f9fa" media="(prefers-color-scheme: light)">
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#202124" media="(prefers-color-scheme: dark)">
   <meta name="theme-color" content="#f8f9fa" media="(prefers-color-scheme: light)">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <link rel="manifest" href="manifest.json">
   <title>Snakes & Ladders</title>
+  
   <style>
+    body {
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      background-color: var(--bg-main, #202124);
+      margin: 0;
+      height: 100dvh;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
     /* Google Messages Theme Variables (Dark/Light Auto-Switch) */
     :root {
       color-scheme: light dark;
@@ -41,7 +49,8 @@
         --board-blue: #2563eb;
       }
     }
-
+  </style>
+</head>
     * {
       box-sizing: border-box;
       margin: 0;
