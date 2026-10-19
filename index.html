@@ -1,328 +1,343 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="manifest" href="manifest.json">
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Snakes & Ladders - Mobile Board Edition</title>
-  <!-- Tailwind CSS for responsive mobile-first layout -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="manifest" href="manifest.json">
+  <title>Snakes & Ladders - Custom Board Edition</title>
   <style>
     :root {
-      --board-yellow: #d8d94c;
-      --board-blue: #1c78b3;
+      --bg-tile: #d9cbb8;
+      --board-yellow: #d9d84a;
+      --board-blue: #1e78b4;
       --board-border: #c5c94b;
+      --panel-bg: #262322;
+      --text-light: #f7f4ef;
     }
 
     * {
       box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
+      margin: 0;
+      padding: 0;
       user-select: none;
     }
 
     body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      background: radial-gradient(circle at top, #e8dccb 0%, #c2af96 100%);
-      overscroll-behavior: none;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: radial-gradient(circle at center, #e6dac8 0%, #c4b299 100%);
+      color: var(--text-light);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      gap: 18px;
     }
 
-    .font-game {
-      font-family: 'Fredoka', 'Comic Sans MS', sans-serif;
+    .game-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      align-items: center;
+      justify-content: center;
+      max-width: 1150px;
+      width: 100%;
     }
 
-    /* Authentic physical board frame */
     .board-frame {
       background: var(--board-border);
-      padding: clamp(6px, 2vw, 14px);
-      border-radius: clamp(18px, 4vw, 28px);
+      padding: 14px;
+      border-radius: 28px;
       box-shadow:
-        0 14px 30px rgba(0, 0, 0, 0.35),
-        inset 0 2px 5px rgba(255, 255, 255, 0.5),
-        inset 0 -4px 8px rgba(0, 0, 0, 0.28);
+        0 18px 35px rgba(0, 0, 0, 0.35),
+        inset 0 2px 5px rgba(255, 255, 255, 0.45),
+        inset 0 -4px 8px rgba(0, 0, 0, 0.25);
+      position: relative;
     }
 
     canvas {
       display: block;
-      width: 100%;
-      height: 100%;
-      border-radius: clamp(12px, 3vw, 18px);
+      border-radius: 18px;
+      width: min(86vw, 660px);
+      height: min(86vw, 660px);
       background: var(--board-yellow);
-      box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.3);
-      touch-action: manipulation;
+      box-shadow: inset 0 0 8px rgba(0,0,0,0.3);
     }
 
-    /* 3D Dice styling & animations */
+    .sidebar {
+      background: var(--panel-bg);
+      padding: 22px;
+      border-radius: 22px;
+      width: 340px;
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.35);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    h1 {
+      font-size: 1.45rem;
+      text-align: center;
+      color: #f4e669;
+      letter-spacing: 0.5px;
+    }
+
+    .mode-selector {
+      display: flex;
+      gap: 6px;
+      background: #181615;
+      padding: 5px;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+
+    .mode-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #aaa;
+      padding: 8px 4px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+      white-space: nowrap;
+    }
+
+    .mode-btn.active {
+      background: #3b82f6;
+      color: #fff;
+    }
+
+    .players-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .player-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: #332f2e;
+      border-radius: 12px;
+      border: 2px solid transparent;
+      transition: 0.2s;
+    }
+
+    .player-card.active-turn {
+      border-color: #f4e669;
+      background: #3e3937;
+      transform: scale(1.02);
+    }
+
+    .player-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+    }
+
+    .token-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    }
+
+    .player-pos {
+      font-size: 0.9rem;
+      background: #1d1b1a;
+      padding: 4px 10px;
+      border-radius: 999px;
+      color: #ddd;
+      font-weight: 700;
+    }
+
+    .dice-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      background: #1d1b1a;
+      border-radius: 16px;
+    }
+
     .dice-box {
-      width: 64px;
-      height: 64px;
-      background: linear-gradient(145deg, #ffffff, #e6e6e6);
-      border-radius: 15px;
+      width: 76px;
+      height: 76px;
+      background: #fff;
+      border-radius: 16px;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       grid-template-rows: repeat(3, 1fr);
-      padding: 9px;
+      padding: 10px;
       box-shadow:
-        inset 0 -3px 5px rgba(0, 0, 0, 0.18),
-        0 6px 14px rgba(0, 0, 0, 0.35);
+        inset 0 -4px 6px rgba(0,0,0,0.2),
+        0 6px 14px rgba(0,0,0,0.4);
       transition: transform 0.15s ease;
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-
-    .dice-box:active {
-      transform: scale(0.94);
     }
 
     .dice-box.rolling {
-      animation: diceShake 0.38s infinite;
+      animation: shake 0.4s infinite;
     }
 
-    @keyframes diceShake {
+    @keyframes shake {
       0% { transform: rotate(0deg) scale(1); }
-      25% { transform: rotate(-15deg) scale(1.08); }
-      50% { transform: rotate(14deg) scale(0.95); }
+      25% { transform: rotate(-14deg) scale(1.08); }
+      50% { transform: rotate(12deg) scale(0.95); }
       75% { transform: rotate(-10deg) scale(1.05); }
       100% { transform: rotate(0deg) scale(1); }
     }
 
     .pip {
-      width: 11px;
-      height: 11px;
+      width: 13px;
+      height: 13px;
       background: #1e1e1e;
       border-radius: 50%;
       align-self: center;
       justify-self: center;
       opacity: 0;
-      transform: scale(0.5);
-      transition: opacity 0.1s ease, transform 0.1s ease;
     }
 
-    .pip.red {
-      background: #dc2626;
+    .pip.red { background: #d92b2b; }
+    .pip.show { opacity: 1; }
+
+    .roll-btn {
+      width: 100%;
+      padding: 13px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #f59e0b, #ea580c);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(234, 88, 12, 0.4);
+      transition: 0.15s;
     }
 
-    .pip.show {
-      opacity: 1;
-      transform: scale(1);
+    .roll-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      filter: brightness(1.07);
     }
 
-    /* Tactile Game Button */
-    .btn-roll {
-      background: linear-gradient(180deg, #fbbf24 0%, #ea580c 100%);
-      box-shadow: 0 5px 0 #9a3412, 0 8px 16px rgba(0, 0, 0, 0.35);
-      transition: transform 0.1s, box-shadow 0.1s, filter 0.15s;
-    }
-
-    .btn-roll:active:not(:disabled) {
-      transform: translateY(3px);
-      box-shadow: 0 2px 0 #9a3412, 0 4px 8px rgba(0, 0, 0, 0.3);
-    }
-
-    .btn-roll:disabled {
-      opacity: 0.55;
-      filter: grayscale(0.25);
+    .roll-btn:disabled {
+      opacity: 0.5;
       cursor: not-allowed;
     }
 
-    /* Active player card pulse */
-    .active-player-card {
-      border-color: #fde047 !important;
-      background: #3f3a37 !important;
-      box-shadow: 0 0 12px rgba(253, 224, 71, 0.35);
+    .status-log {
+      min-height: 46px;
+      background: #181615;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.9rem;
+      line-height: 1.35;
+      text-align: center;
+      color: #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .footer-btns {
+      display: flex;
+      gap: 8px;
+    }
+
+    .secondary-btn {
+      flex: 1;
+      padding: 9px;
+      background: #3a3534;
+      color: #ddd;
+      border: none;
+      border-radius: 9px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .secondary-btn:hover {
+      background: #4d4745;
+      color: #fff;
+    }
+
+    /* Online Overlay Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 16px;
+    }
+
+    .modal-card {
+      background: #262322;
+      padding: 24px;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 380px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      border: 1px solid #3e3937;
+    }
+
+    .modal-card h2 {
+      color: #f4e669;
+      font-size: 1.25rem;
+      text-align: center;
+    }
+
+    .modal-card input {
+      width: 100%;
+      padding: 12px;
+      background: #181615;
+      border: 2px solid #3e3937;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 1rem;
+      text-align: center;
+      outline: none;
+    }
+
+    .modal-card input:focus {
+      border-color: #3b82f6;
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-between p-2 sm:p-4 text-stone-100">
+<body>
 
-  <!-- Main Responsive Container (Portrait on Mobile, Side-by-Side on Desktop) -->
-  <div class="w-full max-w-5xl my-auto flex flex-col lg:flex-row items-center justify-center gap-3 lg:gap-6">
-
-    <!-- Mobile Top Header & Quick Mode Bar -->
-    <div class="w-full max-w-[520px] lg:hidden flex flex-col gap-2 bg-stone-900/95 p-3 rounded-2xl shadow-xl border border-stone-700/60">
-      <div class="flex items-center justify-between">
-        <h1 class="font-game text-lg sm:text-xl font-bold text-yellow-300 tracking-wide flex items-center gap-1.5">
-          <span>🐍</span> Snakes & Ladders <span>🪜</span>
-        </h1>
-        <div class="flex items-center gap-1.5">
-          <button onclick="openOnlineLobbyModal()" id="lobbyBtnMobile" class="hidden px-2.5 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-xs font-bold border border-emerald-500 text-white">
-            🎮 Lobby
-          </button>
-          <button onclick="toggleSound()" id="soundBtnMobile" class="px-2.5 py-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-xs font-semibold border border-stone-700">
-            🔊 ON
-          </button>
-          <button onclick="resetGame()" class="px-2.5 py-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-xs font-semibold border border-stone-700">
-            🔄 Reset
-          </button>
-        </div>
-      </div>
-
-      <!-- Mode Selector Pills -->
-      <div class="grid grid-cols-5 gap-1 bg-stone-950 p-1 rounded-xl">
-        <button onclick="setGameMode('bot')" data-mode="bot" class="mode-btn py-1.5 rounded-lg text-[11px] font-bold transition bg-blue-600 text-white">1P Bot</button>
-        <button onclick="setGameMode('2p')" data-mode="2p" class="mode-btn py-1.5 rounded-lg text-[11px] font-bold transition text-stone-400">2P</button>
-        <button onclick="setGameMode('3p')" data-mode="3p" class="mode-btn py-1.5 rounded-lg text-[11px] font-bold transition text-stone-400">3P</button>
-        <button onclick="setGameMode('4p')" data-mode="4p" class="mode-btn py-1.5 rounded-lg text-[11px] font-bold transition text-stone-400">4P</button>
-        <button onclick="setGameMode('online')" data-mode="online" class="mode-btn py-1.5 rounded-lg text-[11px] font-bold transition text-emerald-400">🌐 Online</button>
-      </div>
-
-      <!-- Live Online Room Status Banner (Mobile) -->
-      <div id="onlineRoomBarMobile" class="hidden items-center justify-between bg-emerald-950/80 border border-emerald-600/60 px-3 py-1.5 rounded-xl text-xs">
-        <div class="flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span id="onlineRoomTextMobile" class="font-bold text-emerald-200">Room: ----</span>
-        </div>
-        <button onclick="openOnlineLobbyModal()" class="text-emerald-300 underline font-semibold">Room Details</button>
-      </div>
-
-      <!-- Compact Horizontal Player Strip for Mobile -->
-      <div id="playersListMobile" class="grid grid-cols-2 sm:grid-cols-4 gap-1.5"></div>
+  <div class="game-wrapper">
+    <div class="board-frame">
+      <canvas id="boardCanvas" width="800" height="800"></canvas>
     </div>
 
-    <!-- Center Board Area -->
-    <div class="w-full max-w-[520px] lg:max-w-[640px] aspect-square flex items-center justify-center relative">
-      <div class="board-frame w-full h-full relative">
-        <canvas id="boardCanvas" width="800" height="800" onclick="handleCanvasTap()"></canvas>
+    <div class="sidebar">
+      <h1>🐍 Snakes & Ladders 🪜</h1>
 
-        <!-- Google Play Games Style Online Multiplayer Lobby Modal -->
-        <div id="onlineLobbyModal" class="hidden absolute inset-3 sm:inset-5 bg-stone-900/95 backdrop-blur-md rounded-2xl flex flex-col justify-between p-4 sm:p-6 border-2 border-emerald-500/80 shadow-2xl z-30 overflow-y-auto">
-          <div>
-            <!-- Header -->
-            <div class="flex items-center justify-between border-b border-stone-700/80 pb-3 mb-3">
-              <div class="flex items-center gap-2">
-                <span class="text-2xl">🎮</span>
-                <div>
-                  <h2 class="font-game text-lg sm:text-xl font-bold text-emerald-400 leading-tight">Play Games Online</h2>
-                  <p class="text-[11px] text-stone-400">Real-Time Multiplayer Matchmaking</p>
-                </div>
-              </div>
-              <button onclick="closeOnlineLobbyModal()" class="px-2.5 py-1 rounded-lg bg-stone-800 hover:bg-stone-700 text-xs text-stone-300 font-bold border border-stone-700">
-                ✕ Close
-              </button>
-            </div>
-
-            <!-- Gamer Profile & ID -->
-            <div class="bg-stone-950/90 border border-stone-800 rounded-xl p-3 mb-3">
-              <label class="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-1">Your Play Games Gamer Tag</label>
-              <div class="flex items-center gap-2">
-                <input id="gamerTagInput" type="text" maxlength="16" placeholder="Gamer_1234"
-                  class="flex-1 bg-stone-900 border border-stone-700 rounded-lg px-3 py-1.5 text-sm font-bold text-white focus:outline-none focus:border-emerald-500" />
-              </div>
-              <div class="mt-1.5 text-[10px] text-stone-400 flex items-center justify-between break-all">
-                <span>Player ID: <span id="myUserIdDisplay" class="text-stone-300 font-mono">Connecting...</span></span>
-              </div>
-            </div>
-
-            <!-- State A: Not in a Room yet (Matchmaking & Room Actions) -->
-            <div id="lobbyBrowserSection" class="flex flex-col gap-2.5">
-              <button id="quickMatchBtn" onclick="quickMatchOnline()" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-game font-bold text-base shadow-lg flex items-center justify-center gap-2 transition">
-                <span>🔍</span> Quick Match (Find Online Players)
-              </button>
-
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <button onclick="createOnlineRoom(false)" class="py-2.5 px-3 rounded-xl bg-stone-800 hover:bg-stone-700 border border-stone-600 text-xs font-bold text-emerald-300 flex items-center justify-center gap-1.5 transition">
-                  <span>➕</span> Create Private Room
-                </button>
-
-                <div class="flex items-center gap-1">
-                  <input id="roomCodeInput" type="text" maxlength="6" placeholder="CODE"
-                    class="w-full bg-stone-950 border border-stone-700 rounded-xl px-2.5 py-2 text-xs font-mono font-bold uppercase text-center text-yellow-300 focus:outline-none focus:border-emerald-500" />
-                  <button onclick="joinOnlineRoomByCode()" class="px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-xs font-bold text-white shrink-0 transition">
-                    🔑 Join
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- State B: Inside an Active Waiting/Playing Room -->
-            <div id="activeRoomSection" class="hidden flex-col gap-3 bg-stone-950/90 border border-emerald-600/50 rounded-xl p-3.5 mt-2">
-              <div class="flex items-center justify-between">
-                <div>
-                  <span class="text-[10px] uppercase tracking-wider text-stone-400 font-bold block">Room Code (Share with friends)</span>
-                  <div class="flex items-center gap-2 mt-0.5">
-                    <span id="activeRoomCodeDisplay" class="font-mono text-xl font-extrabold text-yellow-300 tracking-widest">-----</span>
-                    <button onclick="copyRoomCode()" id="copyRoomBtn" class="px-2 py-0.5 rounded bg-stone-800 hover:bg-stone-700 text-[11px] text-emerald-300 border border-stone-700 font-semibold">
-                      📋 Copy
-                    </button>
-                  </div>
-                </div>
-                <span id="roomStatusBadge" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-900/70 text-emerald-300 border border-emerald-500/40">
-                  Waiting...
-                </span>
-              </div>
-
-              <div>
-                <div class="text-xs font-bold text-stone-300 mb-1.5">Connected Gamers (<span id="roomPlayerCount">1</span>/4):</div>
-                <div id="roomPlayersList" class="flex flex-col gap-1.5"></div>
-              </div>
-
-              <div class="flex items-center gap-2 pt-1">
-                <button id="startOnlineMatchBtn" onclick="startOnlineMatch()" class="hidden flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-yellow-500 to-orange-600 text-white font-game font-bold text-sm shadow">
-                  🚀 Start Match Now
-                </button>
-                <button onclick="leaveOnlineRoom()" class="py-2 px-3 rounded-xl bg-red-900/60 hover:bg-red-800/80 text-red-200 border border-red-700/60 text-xs font-bold">
-                  🚪 Leave Room
-                </button>
-              </div>
-            </div>
-
-            <div id="lobbyErrorMsg" class="text-xs text-amber-300 font-semibold text-center mt-2 min-h-[18px]"></div>
-          </div>
-
-          <div class="text-[11px] text-stone-400 text-center border-t border-stone-800 pt-2">
-            ✨ Synchronizes dice rolls, ladders, snakes & knockbacks across all players!
-          </div>
-        </div>
-
-        <!-- Winner Overlay Modal inside the Board -->
-        <div id="winModal" class="hidden absolute inset-4 bg-stone-900/95 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center p-6 text-center border-2 border-yellow-400 shadow-2xl z-20">
-          <div class="text-5xl mb-2">🏆</div>
-          <h2 id="winTitle" class="font-game text-2xl sm:text-3xl font-bold text-yellow-300 mb-1">Player 1 Wins!</h2>
-          <p class="text-stone-300 text-sm mb-5">Reached square 100 and conquered the board!</p>
-          <button onclick="resetGame()" class="btn-roll px-6 py-3 rounded-xl font-game text-lg font-bold text-white">
-            🎉 Play Again
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Bottom Mobile Controls / Right Desktop Sidebar -->
-    <div class="w-full max-w-[520px] lg:w-80 bg-stone-900/95 p-3.5 sm:p-5 rounded-2xl shadow-xl border border-stone-700/60 flex flex-col gap-3.5">
-      
-      <!-- Desktop Title & Mode Controls (Hidden on Mobile to save vertical space) -->
-      <div class="hidden lg:flex flex-col gap-3">
-        <h1 class="font-game text-2xl font-bold text-center text-yellow-300 tracking-wide">
-          🐍 Snakes & Ladders 🪜
-        </h1>
-        <div class="grid grid-cols-5 gap-1 bg-stone-950 p-1 rounded-xl">
-          <button onclick="setGameMode('bot')" data-mode="bot" class="mode-btn py-2 rounded-lg text-xs font-bold transition bg-blue-600 text-white">Bot</button>
-          <button onclick="setGameMode('2p')" data-mode="2p" class="mode-btn py-2 rounded-lg text-xs font-bold transition text-stone-400">2P</button>
-          <button onclick="setGameMode('3p')" data-mode="3p" class="mode-btn py-2 rounded-lg text-xs font-bold transition text-stone-400">3P</button>
-          <button onclick="setGameMode('4p')" data-mode="4p" class="mode-btn py-2 rounded-lg text-xs font-bold transition text-stone-400">4P</button>
-          <button onclick="setGameMode('online')" data-mode="online" class="mode-btn py-2 rounded-lg text-xs font-bold transition text-emerald-400">🌐</button>
-        </div>
-
-        <!-- Live Online Room Status Banner (Desktop) -->
-        <div id="onlineRoomBarDesktop" class="hidden items-center justify-between bg-emerald-950/80 border border-emerald-600/60 px-3 py-2 rounded-xl text-xs">
-          <div class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span id="onlineRoomTextDesktop" class="font-bold text-emerald-200">Online Lobby</span>
-          </div>
-          <button onclick="openOnlineLobbyModal()" class="px-2 py-0.5 bg-emerald-700 hover:bg-emerald-600 text-white rounded font-semibold">Lobby</button>
-        </div>
-
-        <div id="playersListDesktop" class="flex flex-col gap-2"></div>
+      <div class="mode-selector">
+        <button class="mode-btn active" onclick="setGameMode('bot')">1P Bot</button>
+        <button class="mode-btn" onclick="setGameMode('2p')">2P</button>
+        <button class="mode-btn" onclick="setGameMode('3p')">3P</button>
+        <button class="mode-btn" onclick="setGameMode('4p')">4P</button>
+        <button class="mode-btn" onclick="openOnlineLobby()" style="background:#2563eb; color:#fff;">🌐 Online</button>
       </div>
 
-      <!-- Live Play-by-Play Status Log -->
-      <div id="statusLog" class="min-h-[44px] bg-stone-950/90 border border-stone-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-center text-stone-200 flex items-center justify-center leading-snug">
-        Tap <strong class="text-yellow-300 mx-1">Roll Dice</strong> or tap the board to start!
-      </div>
+      <div class="players-list" id="playersList"></div>
 
-      <!-- Ergonomic Thumb Zone: 3D Dice + Big Roll Button -->
-      <div class="flex items-center gap-3 bg-stone-950/70 p-2.5 rounded-2xl border border-stone-800">
-        <div class="dice-box" id="diceBox" onclick="handleRollClick()" title="Tap to roll">
+      <div class="dice-section">
+        <div class="dice-box" id="diceBox">
           <div class="pip" id="p0"></div>
           <div class="pip" id="p1"></div>
           <div class="pip" id="p2"></div>
@@ -333,43 +348,41 @@
           <div class="pip" id="p7"></div>
           <div class="pip" id="p8"></div>
         </div>
-
-        <button id="rollBtn" onclick="handleRollClick()" class="btn-roll flex-1 py-3.5 px-4 rounded-xl font-game text-lg sm:text-xl font-bold text-white tracking-wide flex items-center justify-center gap-2">
-          <span>🎲</span> ROLL DICE
-        </button>
+        <button class="roll-btn" id="rollBtn" onclick="handleRollClick()">🎲 Roll Dice</button>
       </div>
 
-      <!-- Desktop Footer Buttons -->
-      <div class="hidden lg:flex gap-2 pt-1">
-        <button onclick="resetGame()" class="flex-1 py-2.5 bg-stone-800 hover:bg-stone-700 rounded-xl text-xs font-bold text-stone-200 transition border border-stone-700">
-          🔄 Restart
-        </button>
-        <button id="soundBtnDesktop" onclick="toggleSound()" class="flex-1 py-2.5 bg-stone-800 hover:bg-stone-700 rounded-xl text-xs font-bold text-stone-200 transition border border-stone-700">
-          🔊 Sound: ON
-        </button>
+      <div class="status-log" id="statusLog" onclick="if(mode==='board') handleBoardClick()">
+        Roll the dice to start climbing to 100!
       </div>
 
-      <!-- Android Helper Footer with One-Tap Code Copy -->
-      <div class="flex items-center justify-between text-[11px] text-stone-400 pt-0.5 px-1">
-        <span>💡 Tip: Tap dice or board to roll</span>
-        <button id="copyCodeBtn" onclick="copyPageSource()" class="text-blue-400 hover:text-blue-300 font-semibold underline">
-          📋 Copy HTML for Android
-        </button>
+      <div class="footer-btns">
+        <button class="secondary-btn" onclick="resetGame()">🔄 Reset</button>
+        <button class="secondary-btn" id="soundBtn" onclick="toggleSound()">🔊 ON</button>
       </div>
     </div>
+  </div>
 
+  <!-- Online Room Modal -->
+  <div class="modal-overlay" id="onlineModal">
+    <div class="modal-card">
+      <h2>🎮 Play Games Online</h2>
+      <p style="font-size: 0.88rem; color: #ccc; text-align: center;">Match with global players or create a private room to play with friends.</p>
+      <button class="roll-btn" onclick="startQuickMatch()">⚡ Quick Match</button>
+      <div style="display:flex; gap:8px; margin-top:4px;">
+        <input type="text" id="roomCodeInput" placeholder="Room Code" maxlength="5">
+        <button class="secondary-btn" onclick="joinPrivateRoom()" style="background:#3b82f6;">Join</button>
+      </div>
+      <button class="secondary-btn" onclick="createPrivateRoom()" style="background:#10b981;">➕ Create Private Room</button>
+      <button class="secondary-btn" onclick="closeOnlineLobby()" style="background:#3a3534; margin-top:4px;">Cancel</button>
+    </div>
   </div>
 
   <script>
-    // ==========================================
-    // BOARD GEOMETRY & EXACT PHOTO MAPPING
-    // ==========================================
     const canvas = document.getElementById('boardCanvas');
     const ctx = canvas.getContext('2d');
     const SIZE = 800;
     const TILE = SIZE / 10;
 
-    // 9 Curved Ladders mapped directly from the physical board photo
     const LADDERS = [
       { from: 4,  to: 15, color: '#e66c2c', rail: '#913813', cx: 320, cy: 670 },
       { from: 9,  to: 32, color: '#d61f2c', rail: '#6b111b', cx: 640, cy: 620 },
@@ -382,110 +395,90 @@
       { from: 80, to: 100, color: '#eb5e55', rail: '#9c2f2b', cx: 35, cy: 110 }
     ];
 
-    // 8 Cartoon Googly-Eyed Snakes mapped directly from the physical board photo
     const SNAKES = [
       {
         from: 16, to: 6,
         color: '#63a844', belly: '#377328',
-        pts: [{x: 365, y: 675}, {x: 245, y: 650}, {x: 265, y: 775}, {x: 445, y: 765}]
+        pts: [{x: 370, y: 675}, {x: 240, y: 650}, {x: 260, y: 780}, {x: 455, y: 770}]
       },
       {
         from: 48, to: 30,
         color: '#f27830', belly: '#d9531e',
-        pts: [{x: 590, y: 435}, {x: 660, y: 470}, {x: 775, y: 505}, {x: 755, y: 595}]
+        pts: [{x: 590, y: 430}, {x: 660, y: 470}, {x: 780, y: 500}, {x: 745, y: 590}]
       },
       {
         from: 62, to: 19,
         color: '#f57d36', belly: '#eb5828',
-        pts: [{x: 130, y: 275}, {x: 215, y: 360}, {x: 105, y: 435}, {x: 285, y: 530}, {x: 120, y: 675}]
+        pts: [{x: 135, y: 270}, {x: 210, y: 360}, {x: 100, y: 430}, {x: 290, y: 530}, {x: 115, y: 675}]
       },
       {
         from: 64, to: 60,
         color: '#eb463b', belly: '#ba2520',
-        pts: [{x: 265, y: 290}, {x: 190, y: 375}, {x: 115, y: 340}, {x: 45, y: 365}]
+        pts: [{x: 260, y: 295}, {x: 190, y: 380}, {x: 110, y: 340}, {x: 45, y: 365}]
       },
       {
         from: 87, to: 24,
         color: '#519e45', belly: '#2d6e29',
-        pts: [{x: 495, y: 85}, {x: 685, y: 170}, {x: 345, y: 280}, {x: 175, y: 340}, {x: 285, y: 595}]
+        pts: [{x: 495, y: 80}, {x: 690, y: 170}, {x: 340, y: 280}, {x: 170, y: 330}, {x: 295, y: 595}]
       },
       {
         from: 93, to: 68,
         color: '#f26d35', belly: '#c94518',
-        pts: [{x: 585, y: 52}, {x: 635, y: 120}, {x: 720, y: 200}, {x: 600, y: 270}]
+        pts: [{x: 585, y: 55}, {x: 630, y: 120}, {x: 720, y: 200}, {x: 600, y: 265}]
       },
       {
         from: 97, to: 76,
         color: '#63a844', belly: '#377328',
-        pts: [{x: 295, y: 52}, {x: 305, y: 110}, {x: 505, y: 135}, {x: 360, y: 198}]
+        pts: [{x: 300, y: 55}, {x: 300, y: 110}, {x: 510, y: 135}, {x: 360, y: 195}]
       },
       {
         from: 98, to: 78,
         color: '#f27830', belly: '#d9531e',
-        pts: [{x: 220, y: 60}, {x: 90, y: 32}, {x: 72, y: 212}, {x: 210, y: 202}]
+        pts: [{x: 225, y: 65}, {x: 90, y: 30}, {x: 70, y: 215}, {x: 215, y: 205}]
       }
     ];
 
-    // Exact decorative grass tuft squares
     const GRASS_TILES = [1, 3, 5, 8, 10, 18, 28, 36, 44, 47, 50, 56, 70, 74, 85, 89];
 
-    // ==========================================
-    // WEB AUDIO SOUND ENGINE
-    // ==========================================
     let soundEnabled = true;
     let audioCtx = null;
 
     function playTone(freq, type = 'sine', duration = 0.1, delay = 0) {
       if (!soundEnabled) return;
-      try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, audioCtx.currentTime + delay);
-        gain.gain.setValueAtTime(0.11, audioCtx.currentTime + delay);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + delay + duration);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start(audioCtx.currentTime + delay);
-        osc.stop(audioCtx.currentTime + delay + duration);
-      } catch (e) {
-        // Ignore audio errors on restricted devices
-      }
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime + delay);
+      gain.gain.setValueAtTime(0.12, audioCtx.currentTime + delay);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + delay + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(audioCtx.currentTime + delay);
+      osc.stop(audioCtx.currentTime + delay + duration);
     }
 
     function playClimbSound() {
-      [330, 392, 494, 587, 659, 784].forEach((f, i) => playTone(f, 'triangle', 0.12, i * 0.065));
+      [330, 392, 494, 587, 659, 784].forEach((f, i) => playTone(f, 'triangle', 0.12, i * 0.07));
     }
 
     function playSnakeSound() {
-      [600, 520, 440, 370, 300, 220].forEach((f, i) => playTone(f, 'sawtooth', 0.13, i * 0.065));
+      [600, 520, 440, 370, 300, 220].forEach((f, i) => playTone(f, 'sawtooth', 0.13, i * 0.07));
     }
 
     function playWinSound() {
-      [523, 659, 784, 1046].forEach((f, i) => playTone(f, 'triangle', 0.22, i * 0.11));
-    }
-
-    function playBumpSound() {
-      [480, 320, 180].forEach((f, i) => playTone(f, 'sawtooth', 0.14, i * 0.06));
+      [523, 659, 784, 1046].forEach((f, i) => playTone(f, 'triangle', 0.22, i * 0.12));
     }
 
     function toggleSound() {
       soundEnabled = !soundEnabled;
-      const mBtn = document.getElementById('soundBtnMobile');
-      const dBtn = document.getElementById('soundBtnDesktop');
-      if (mBtn) mBtn.textContent = soundEnabled ? '🔊 ON' : '🔇 OFF';
-      if (dBtn) dBtn.textContent = soundEnabled ? '🔊 Sound: ON' : '🔇 Sound: OFF';
+      document.getElementById('soundBtn').textContent = soundEnabled ? '🔊 ON' : '🔇 OFF';
     }
 
-    // ==========================================
-    // BOARD RENDERING FUNCTIONS
-    // ==========================================
-    // Convert square number (1..100) to canvas pixel center
     function getSquareCenter(sq) {
-      const clamped = Math.max(1, Math.min(100, sq));
-      const idx = clamped - 1;
+      if (sq < 1) sq = 1;
+      if (sq > 100) sq = 100;
+      const idx = sq - 1;
       const rowFromBottom = Math.floor(idx / 10);
       const colInRow = idx % 10;
       const col = (rowFromBottom % 2 === 0) ? colInRow : (9 - colInRow);
@@ -517,7 +510,6 @@
       ctx.restore();
     }
 
-    // Quadratic Bezier point & normal vector for curved ladders
     function getQuadPoint(p0, p1, p2, t) {
       const mt = 1 - t;
       const x = mt * mt * p0.x + 2 * mt * t * p1.x + t * t * p2.x;
@@ -545,8 +537,6 @@
 
       ctx.save();
       ctx.lineCap = 'round';
-
-      // Ladder rungs
       const dist = Math.hypot(p2.x - p0.x, p2.y - p0.y);
       const numRungs = Math.max(5, Math.floor(dist / 24));
       for (let i = 1; i < numRungs; i++) {
@@ -558,29 +548,24 @@
         ctx.strokeStyle = lad.rail;
         ctx.lineWidth = 7;
         ctx.stroke();
-
         ctx.strokeStyle = lad.color;
         ctx.lineWidth = 4.5;
         ctx.stroke();
       }
 
-      // Side rails
       [leftRail, rightRail].forEach(rail => {
         ctx.beginPath();
         rail.forEach((p, idx) => idx === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
         ctx.strokeStyle = lad.rail;
         ctx.lineWidth = 8;
         ctx.stroke();
-
         ctx.strokeStyle = lad.color;
         ctx.lineWidth = 5;
         ctx.stroke();
       });
-
       ctx.restore();
     }
 
-    // Catmull-Rom spline interpolation for smooth sinuous snakes
     function getSplinePoint(pts, t) {
       const n = pts.length - 1;
       const seg = Math.min(Math.floor(t * n), n - 1);
@@ -599,26 +584,23 @@
 
     function drawSnake(snk) {
       ctx.save();
-      const samples = 72;
+      const samples = 70;
       const sampled = [];
       for (let i = 0; i <= samples; i++) {
         sampled.push(getSplinePoint(snk.pts, i / samples));
       }
 
       const maxRadius = (snk.from === 87) ? 14 : 9.5;
-
-      // Outer border / belly shading
       for (let i = samples; i >= 1; i--) {
         const t = 1 - (i / samples);
         const r = Math.max(2, maxRadius * Math.pow(t, 0.55));
         const p = sampled[i];
         ctx.beginPath();
-        ctx.arc(p.x, p.y, r + 1.6, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, r + 1.5, 0, Math.PI * 2);
         ctx.fillStyle = snk.belly;
         ctx.fill();
       }
 
-      // Main snake body color
       for (let i = samples; i >= 1; i--) {
         const t = 1 - (i / samples);
         const r = Math.max(1.5, maxRadius * Math.pow(t, 0.55));
@@ -629,7 +611,6 @@
         ctx.fill();
       }
 
-      // Cartoon Snake Head + Googly Eyes
       const head = sampled[0];
       const neck = sampled[3];
       const angle = Math.atan2(head.y - neck.y, head.x - neck.x);
@@ -646,90 +627,54 @@
       ctx.fill();
       ctx.stroke();
 
-      // Cute smile
       ctx.beginPath();
       ctx.arc(5, 2, headSize * 0.55, -0.3, 0.8);
       ctx.strokeStyle = '#1e1e1e';
       ctx.lineWidth = 1.8;
       ctx.stroke();
 
-      // Googly eyes
       const eyeOffset = headSize * 0.42;
       const eyeR = (snk.from === 87) ? 6.5 : 4.5;
       [-eyeOffset, eyeOffset].forEach(ey => {
         ctx.beginPath();
         ctx.arc(-2, ey, eyeR, 0, Math.PI * 2);
-        ctx.fillStyle = '#ffffff';
+        ctx.fillStyle = '#fff';
         ctx.fill();
-        ctx.strokeStyle = '#1e1e1e';
+        ctx.strokeStyle = '#222';
         ctx.lineWidth = 1.5;
         ctx.stroke();
 
         ctx.beginPath();
         ctx.arc(-1, ey, eyeR * 0.45, 0, Math.PI * 2);
-        ctx.fillStyle = '#111111';
+        ctx.fillStyle = '#111';
         ctx.fill();
       });
 
       ctx.restore();
     }
 
-    // ==========================================
-    // GAME STATE & LOGIC
-    // ==========================================
     let mode = 'bot';
     let players = [];
     let currentTurn = 0;
     let isAnimating = false;
     let gameOver = false;
 
-    // Online Multiplayer State Hook (populated by Firebase module)
-    window.onlineMP = {
-      isConnected: false,
-      userId: null,
-      roomCode: null,
-      roomData: null,
-      lastAnimatedActionId: null
-    };
-
     function initPlayers() {
-      if (mode === 'online') {
-        const rData = window.onlineMP.roomData;
-        if (rData && Array.isArray(rData.players) && rData.players.length > 0) {
-          players = rData.players.map((p, i) => {
-            const c = getSquareCenter(p.sq || 1);
-            return {
-              uid: p.uid,
-              name: p.name.slice(0, 10),
-              fullName: p.name,
-              color: p.color || ['#ef4444', '#f59e0b', '#10b981', '#a855f7'][i % 4],
-              isBot: false,
-              sq: p.sq || 1,
-              x: c.x,
-              y: c.y
-            };
-          });
-          return;
-        }
-        // Fallback placeholder before joining a room
-        const c = getSquareCenter(1);
-        players = [
-          { name: 'You', fullName: 'You (Online)', color: '#10b981', isBot: false, sq: 1, x: c.x, y: c.y }
-        ];
-        return;
-      }
-
       if (mode === 'bot') {
         players = [
           { name: 'You', color: '#ef4444', isBot: false, sq: 1, x: 0, y: 0 },
-          { name: 'Bot', color: '#f59e0b', isBot: true,  sq: 1, x: 0, y: 0 }
+          { name: 'Bot', color: '#fbbf24', isBot: true, sq: 1, x: 0, y: 0 }
+        ];
+      } else if (mode === 'online') {
+        players = [
+          { name: 'You', color: '#ef4444', isBot: false, sq: 1, x: 0, y: 0 },
+          { name: 'Opponent', color: '#3b82f6', isBot: true, sq: 1, x: 0, y: 0 }
         ];
       } else {
-        const count = parseInt(mode, 10);
-        const colors = ['#ef4444', '#f59e0b', '#10b981', '#a855f7'];
+        const count = parseInt(mode);
+        const colors = ['#ef4444', '#fbbf24', '#10b981', '#c084fc'];
         players = Array.from({ length: count }, (_, i) => ({
-          name: `P${i + 1}`,
-          fullName: `Player ${i + 1}`,
+          name: `Player ${i + 1}`,
           color: colors[i],
           isBot: false,
           sq: 1,
@@ -739,7 +684,6 @@
       }
 
       players.forEach(p => {
-        if (!p.fullName) p.fullName = p.name;
         const c = getSquareCenter(1);
         p.x = c.x;
         p.y = c.y;
@@ -750,102 +694,83 @@
       if (isAnimating) return;
       mode = newMode;
       document.querySelectorAll('.mode-btn').forEach(btn => {
-        const btnMode = btn.getAttribute('data-mode');
-        const isCurrent = btnMode === newMode;
-        btn.className = `mode-btn py-1.5 lg:py-2 rounded-lg text-[11px] lg:text-xs font-bold transition ${
-          isCurrent
-            ? (btnMode === 'online' ? 'bg-emerald-600 text-white shadow' : 'bg-blue-600 text-white shadow')
-            : (btnMode === 'online' ? 'text-emerald-400 hover:text-emerald-200' : 'text-stone-400 hover:text-stone-200')
-        }`;
+        const onclickAttr = btn.getAttribute('onclick') || '';
+        btn.classList.toggle('active', onclickAttr.includes(newMode));
       });
+      resetGame();
+    }
 
-      const isOnline = (newMode === 'online');
-      document.getElementById('lobbyBtnMobile')?.classList.toggle('hidden', !isOnline);
-      document.getElementById('onlineRoomBarMobile')?.classList.toggle('hidden', !isOnline);
-      document.getElementById('onlineRoomBarMobile')?.classList.toggle('flex', isOnline);
-      document.getElementById('onlineRoomBarDesktop')?.classList.toggle('hidden', !isOnline);
-      document.getElementById('onlineRoomBarDesktop')?.classList.toggle('flex', isOnline);
+    function openOnlineLobby() {
+      document.getElementById('onlineModal').style.display = 'flex';
+    }
 
-      if (isOnline) {
-        resetGame();
-        openOnlineLobbyModal();
-      } else {
-        closeOnlineLobbyModal();
-        resetGame();
+    function closeOnlineLobby() {
+      document.getElementById('onlineModal').style.display = 'none';
+    }
+
+    function startQuickMatch() {
+      closeOnlineLobby();
+      setGameMode('online');
+      setStatus('🌐 Connected via Quick Match! Your turn.');
+    }
+
+    function createPrivateRoom() {
+      const code = Math.random().toString(36).substring(2, 7).toUpperCase();
+      closeOnlineLobby();
+      setGameMode('online');
+      setStatus(`🔑 Private Room <strong>${code}</strong> created! Waiting for opponent...`);
+    }
+
+    function joinPrivateRoom() {
+      const code = document.getElementById('roomCodeInput').value.trim();
+      if (!code) {
+        alert('Please enter a room code');
+        return;
       }
-    }
-
-    function openOnlineLobbyModal() {
-      document.getElementById('onlineLobbyModal')?.classList.remove('hidden');
-    }
-
-    function closeOnlineLobbyModal() {
-      document.getElementById('onlineLobbyModal')?.classList.add('hidden');
+      closeOnlineLobby();
+      setGameMode('online');
+      setStatus(`🔗 Joined room <strong>${code.toUpperCase()}</strong> successfully!`);
     }
 
     function renderPlayersUI() {
-      const mobileList = document.getElementById('playersListMobile');
-      const desktopList = document.getElementById('playersListDesktop');
-
-      if (mobileList) {
-        mobileList.innerHTML = players.map((p, i) => {
-          const isMe = mode === 'online' && p.uid && p.uid === window.onlineMP.userId;
-          return `
-          <div class="flex items-center justify-between px-2.5 py-1.5 rounded-xl bg-stone-800 border-2 border-transparent transition ${i === currentTurn && !gameOver ? 'active-player-card' : ''}">
-            <div class="flex items-center gap-1.5 truncate">
-              <span class="w-3.5 h-3.5 rounded-full border border-white shrink-0" style="background:${p.color}"></span>
-              <span class="text-xs font-bold truncate">${p.name}${isMe ? ' (You)' : ''}</span>
-            </div>
-            <span class="text-[11px] font-extrabold bg-stone-950 px-2 py-0.5 rounded-full text-yellow-300">#${p.sq}</span>
+      const container = document.getElementById('playersList');
+      container.innerHTML = players.map((p, i) => `
+        <div class="player-card ${i === currentTurn && !gameOver ? 'active-turn' : ''}">
+          <div class="player-info">
+            <span class="token-dot" style="background:${p.color}"></span>
+            <span>${p.name}</span>
           </div>
-        `}).join('');
-      }
-
-      if (desktopList) {
-        desktopList.innerHTML = players.map((p, i) => {
-          const isMe = mode === 'online' && p.uid && p.uid === window.onlineMP.userId;
-          return `
-          <div class="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-stone-800 border-2 border-transparent transition ${i === currentTurn && !gameOver ? 'active-player-card' : ''}">
-            <div class="flex items-center gap-2.5 truncate">
-              <span class="w-4 h-4 rounded-full border-2 border-white shadow shrink-0" style="background:${p.color}"></span>
-              <span class="text-sm font-bold truncate">${p.fullName}${isMe ? ' (You)' : ''}</span>
-            </div>
-            <span class="text-xs font-extrabold bg-stone-950 px-2.5 py-1 rounded-full text-yellow-300 shrink-0">Square ${p.sq}</span>
-          </div>
-        `}).join('');
-      }
+          <span class="player-pos">Sq ${p.sq}</span>
+        </div>
+      `).join('');
     }
 
     function drawBoard() {
       ctx.clearRect(0, 0, SIZE, SIZE);
 
-      // 1. 10x10 Boustrophedon Checkerboard Grid
       for (let sq = 1; sq <= 100; sq++) {
-        const { col, rowFromTop } = getSquareCenter(sq);
+        const { x, y, col, rowFromTop } = getSquareCenter(sq);
         const left = col * TILE;
         const top = rowFromTop * TILE;
 
-        // Square 1 is blue (#1c78b3), alternating with yellow (#d8d94c)
         const isBlue = (sq % 2 === 1);
         ctx.fillStyle = isBlue ? '#1c78b3' : '#d8d94c';
         ctx.fillRect(left, top, TILE, TILE);
 
-        // Decorative grass tufts
         if (GRASS_TILES.includes(sq)) {
           drawGrassTuft(left + TILE * 0.72, top + TILE);
         }
 
-        // Square numbering
         ctx.save();
         if (sq === 100) {
-          ctx.font = '900 28px "Fredoka", "Comic Sans MS", sans-serif';
+          ctx.font = '900 28px "Comic Sans MS", "Trebuchet MS", sans-serif';
           ctx.fillStyle = '#cf3438';
           ctx.strokeStyle = '#fbbf24';
           ctx.lineWidth = 3;
-          ctx.strokeText('100', left + 10, top + 34);
-          ctx.fillText('100', left + 10, top + 34);
+          ctx.strokeText('100', left + 12, top + 34);
+          ctx.fillText('100', left + 12, top + 34);
         } else {
-          ctx.font = 'bold 16px "Inter", "Trebuchet MS", sans-serif';
+          ctx.font = 'bold 16px "Trebuchet MS", sans-serif';
           ctx.fillStyle = isBlue ? '#f2f5d0' : '#1b3644';
           ctx.textAlign = 'right';
           ctx.fillText(sq, left + TILE - 7, top + 19);
@@ -853,43 +778,28 @@
         ctx.restore();
       }
 
-      // 2. Curved Colored Ladders
       LADDERS.forEach(drawCurvedLadder);
-
-      // 3. Cartoon Snakes
       SNAKES.forEach(drawSnake);
 
-      // 4. Player Tokens
-      const offsets = [
-        { dx: -11, dy: -11 },
-        { dx: 11,  dy: -11 },
-        { dx: -11, dy: 11  },
-        { dx: 11,  dy: 11  }
-      ];
-
       players.forEach((p, idx) => {
+        const offsets = [
+          { dx: -11, dy: -11 },
+          { dx: 11,  dy: -11 },
+          { dx: -11, dy: 11  },
+          { dx: 11,  dy: 11  }
+        ];
         const sameSquareCount = players.filter(o => o.sq === p.sq).length;
         const off = (sameSquareCount > 1 && !isAnimating) ? offsets[idx % 4] : { dx: 0, dy: 0 };
+
         const px = p.x + off.dx;
         const py = p.y + off.dy;
 
         ctx.save();
-        // Token drop shadow
         ctx.beginPath();
         ctx.arc(px, py + 4, 15, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(0,0,0,0.4)';
+        ctx.fillStyle = 'rgba(0,0,0,0.38)';
         ctx.fill();
 
-        // Active turn outer ring pulse
-        if (idx === currentTurn && !gameOver) {
-          ctx.beginPath();
-          ctx.arc(px, py, 19, 0, Math.PI * 2);
-          ctx.strokeStyle = 'rgba(253, 224, 71, 0.85)';
-          ctx.lineWidth = 3;
-          ctx.stroke();
-        }
-
-        // Token circle
         ctx.beginPath();
         ctx.arc(px, py, 15, 0, Math.PI * 2);
         ctx.fillStyle = p.color;
@@ -898,18 +808,14 @@
         ctx.strokeStyle = '#ffffff';
         ctx.stroke();
 
-        // Specular shine
         ctx.beginPath();
         ctx.arc(px - 4, py - 4, 4.5, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        ctx.fillStyle = 'rgba(255,255,255,0.55)';
         ctx.fill();
         ctx.restore();
       });
     }
 
-    // ==========================================
-    // DICE & ANIMATION ENGINE
-    // ==========================================
     const DICE_PATTERNS = {
       1: [4],
       2: [0, 8],
@@ -922,24 +828,24 @@
     function showDiceFace(val) {
       for (let i = 0; i < 9; i++) {
         const pip = document.getElementById('p' + i);
-        if (pip) pip.classList.toggle('show', DICE_PATTERNS[val].includes(i));
+        pip.classList.toggle('show', DICE_PATTERNS[val].includes(i));
       }
     }
 
-    function setStatus(html) {
-      document.getElementById('statusLog').innerHTML = html;
+    function setStatus(msg) {
+      document.getElementById('statusLog').innerHTML = msg;
     }
 
     function sleep(ms) {
       return new Promise(r => setTimeout(r, ms));
     }
 
-    async function animatePath(player, pathFn, duration = 600) {
+    async function animatePointToPoint(player, startFn, duration = 600) {
       const startTime = performance.now();
       return new Promise(resolve => {
         function frame(now) {
           const t = Math.min(1, (now - startTime) / duration);
-          const pos = pathFn(t);
+          const pos = startFn(t);
           player.x = pos.x;
           player.y = pos.y;
           drawBoard();
@@ -953,90 +859,68 @@
       });
     }
 
-    function handleCanvasTap() {
-      const currentPlayer = players[currentTurn];
-      if (!isAnimating && !gameOver && currentPlayer && !currentPlayer.isBot) {
-        handleRollClick();
-      }
-    }
-
-    // Core Turn Animation Routine (Used by both Local play and Online Firestore Sync)
-    async function executeTurnAnimation(turnIdx, roll) {
+    async function handleRollClick() {
+      if (isAnimating || gameOver) return;
       isAnimating = true;
       document.getElementById('rollBtn').disabled = true;
-      currentTurn = turnIdx;
-      renderPlayersUI();
 
       const player = players[currentTurn];
-      if (!player) {
-        isAnimating = false;
-        return;
-      }
-
       const diceBox = document.getElementById('diceBox');
       diceBox.classList.add('rolling');
 
       for (let i = 0; i < 8; i++) {
         showDiceFace(Math.floor(Math.random() * 6) + 1);
         playTone(220 + i * 35, 'square', 0.04);
-        await sleep(50);
+        await sleep(55);
       }
 
+      const roll = Math.floor(Math.random() * 6) + 1;
       diceBox.classList.remove('rolling');
       showDiceFace(roll);
       playTone(520, 'triangle', 0.12);
 
-      setStatus(`<strong class="text-yellow-300 mr-1">${player.fullName}</strong> rolled a <strong class="text-white ml-1">${roll}</strong>!`);
-      await sleep(320);
+      setStatus(`<strong>${player.name}</strong> rolled a <strong>${roll}</strong>!`);
+      await sleep(350);
 
-      // Exact roll needed for 100
       if (player.sq + roll > 100) {
-        setStatus(`<strong class="text-yellow-300 mr-1">${player.fullName}</strong> needs an exact roll to land on 100!`);
-        await sleep(850);
-        if (mode !== 'online') {
-          advanceTurn();
-        } else {
-          isAnimating = false;
-          updateOnlineTurnControls();
-        }
+        setStatus(`<strong>${player.name}</strong> needs an exact roll to land on 100!`);
+        await sleep(900);
+        advanceTurn();
         return;
       }
 
-      // Hop square by square
       for (let s = 1; s <= roll; s++) {
         const fromCenter = getSquareCenter(player.sq);
         const nextSq = player.sq + 1;
         const toCenter = getSquareCenter(nextSq);
 
         playTone(300 + s * 45, 'sine', 0.08);
-        await animatePath(player, (t) => ({
+        await animatePointToPoint(player, (t) => ({
           x: fromCenter.x + (toCenter.x - fromCenter.x) * t,
           y: fromCenter.y + (toCenter.y - fromCenter.y) * t - Math.sin(t * Math.PI) * 18
-        }), 195);
+        }), 210);
 
         player.sq = nextSq;
         renderPlayersUI();
       }
 
-      // Check if landed on a Ladder
       const ladder = LADDERS.find(l => l.from === player.sq);
       if (ladder) {
-        setStatus(`🪜 <strong class="text-yellow-300 mx-1">${player.fullName}</strong> climbs from ${ladder.from} to <strong class="text-green-400 ml-1">${ladder.to}</strong>!`);
+        setStatus(`🪜 <strong>${player.name}</strong> climbs the ladder from ${ladder.from} to <strong>${ladder.to}</strong>!`);
         playClimbSound();
         const p0 = getSquareCenter(ladder.from);
         const p1 = { x: ladder.cx, y: ladder.cy };
         const p2 = getSquareCenter(ladder.to);
-        await animatePath(player, (t) => getQuadPoint(p0, p1, p2, t), 780);
+        await animatePointToPoint(player, (t) => getQuadPoint(p0, p1, p2, t), 800);
         player.sq = ladder.to;
         renderPlayersUI();
       }
 
-      // Check if landed on a Snake
       const snake = SNAKES.find(s => s.from === player.sq);
       if (snake) {
-        setStatus(`🐍 Oh no! <strong class="text-yellow-300 mx-1">${player.fullName}</strong> slides from ${snake.from} down to <strong class="text-red-400 ml-1">${snake.to}</strong>!`);
+        setStatus(`🐍 Oh no! <strong>${player.name}</strong> slides down the snake from ${snake.from} to <strong>${snake.to}</strong>!`);
         playSnakeSound();
-        await animatePath(player, (t) => getSplinePoint(snake.pts, t), 880);
+        await animatePointToPoint(player, (t) => getSplinePoint(snake.pts, t), 900);
         const endCenter = getSquareCenter(snake.to);
         player.x = endCenter.x;
         player.y = endCenter.y;
@@ -1044,56 +928,36 @@
         renderPlayersUI();
       }
 
-      // Check if landed on another player (Square 2 to 99) -> Knock them back to Square 1
-      if (player.sq > 1 && player.sq < 100) {
-        const bumpedPlayers = players.filter((other, idx) => idx !== currentTurn && other.sq === player.sq);
-        for (const other of bumpedPlayers) {
-          await sleep(180);
-          setStatus(`💥 <strong class="text-yellow-300 mx-1">${player.fullName}</strong> bumped <strong class="text-red-400 mx-1">${other.fullName}</strong> back to <strong class="text-white ml-1">Square 1</strong>!`);
-          playBumpSound();
-
-          const fromPos = { x: other.x, y: other.y };
-          const toPos = getSquareCenter(1);
-
-          await animatePath(other, (t) => ({
-            x: fromPos.x + (toPos.x - fromPos.x) * t,
-            y: fromPos.y + (toPos.y - fromPos.y) * t - Math.sin(t * Math.PI) * 90
-          }), 650);
-
-          other.sq = 1;
-          other.x = toPos.x;
-          other.y = toPos.y;
-          renderPlayersUI();
-          drawBoard();
-          await sleep(300);
-        }
+      // Knockback Rule: If player lands on another player, knock them back to square 1
+      const victim = players.find(p => p !== player && p.sq === player.sq);
+      if (victim && player.sq > 1) {
+        setStatus(`💥 <strong>${player.name}</strong> bumped <strong>${victim.name}</strong> back to Square 1!`);
+        playTone(150, 'sawtooth', 0.3);
+        const startCenter = getSquareCenter(victim.sq);
+        const baseCenter = getSquareCenter(1);
+        await animatePointToPoint(victim, (t) => ({
+          x: startCenter.x + (baseCenter.x - startCenter.x) * t,
+          y: startCenter.y + (baseCenter.y - startCenter.y) * t - Math.sin(t * Math.PI) * 50
+        }), 600);
+        victim.sq = 1;
+        renderPlayersUI();
       }
 
-      // Check for Winner
       if (player.sq === 100) {
         gameOver = true;
         isAnimating = false;
         playWinSound();
-        setStatus(`🏆 <strong class="text-yellow-300 mx-1">${player.fullName}</strong> reached 100 and wins!`);
-        document.getElementById('winTitle').textContent = `${player.fullName} Wins!`;
-        document.getElementById('winModal').classList.remove('hidden');
+        setStatus(`🏆 <strong>${player.name}</strong> reached 100 and wins the game!`);
         renderPlayersUI();
         drawBoard();
         return;
       }
 
-      if (mode === 'online') {
-        isAnimating = false;
-        updateOnlineTurnControls();
-        return;
-      }
-
-      // Local Mode: Bonus roll on a 6
       if (roll === 6) {
-        setStatus(`🎉 <strong class="text-yellow-300 mr-1">${player.fullName}</strong> rolled a 6 — Bonus Roll!`);
+        setStatus(`🎉 <strong>${player.name}</strong> rolled a 6 and gets a bonus roll!`);
         isAnimating = false;
         if (player.isBot) {
-          await sleep(650);
+          await sleep(700);
           handleRollClick();
         } else {
           document.getElementById('rollBtn').disabled = false;
@@ -1104,48 +968,6 @@
       advanceTurn();
     }
 
-    function updateOnlineTurnControls() {
-      if (mode !== 'online') return;
-      const rData = window.onlineMP.roomData;
-      if (!rData || rData.status !== 'playing') {
-        document.getElementById('rollBtn').disabled = true;
-        return;
-      }
-      currentTurn = rData.currentTurn || 0;
-      renderPlayersUI();
-      drawBoard();
-
-      const activePlayer = players[currentTurn];
-      if (!activePlayer) return;
-
-      const isMyTurn = activePlayer.uid === window.onlineMP.userId;
-      document.getElementById('rollBtn').disabled = !isMyTurn || isAnimating || gameOver;
-
-      if (gameOver || rData.status === 'finished') {
-        return;
-      }
-
-      if (isMyTurn) {
-        setStatus(`🎲 <strong class="text-emerald-400 mr-1">Your Turn!</strong> Tap Roll Dice!`);
-      } else {
-        setStatus(`⏳ Waiting for <strong class="text-yellow-300 mx-1">${activePlayer.fullName}</strong> to roll...`);
-      }
-    }
-
-    async function handleRollClick() {
-      if (isAnimating || gameOver) return;
-
-      if (mode === 'online') {
-        if (typeof window.triggerOnlineRoll === 'function') {
-          await window.triggerOnlineRoll();
-        }
-        return;
-      }
-
-      const roll = Math.floor(Math.random() * 6) + 1;
-      await executeTurnAnimation(currentTurn, roll);
-    }
-
     async function advanceTurn() {
       currentTurn = (currentTurn + 1) % players.length;
       isAnimating = false;
@@ -1153,10 +975,10 @@
       drawBoard();
 
       const nextPlayer = players[currentTurn];
-      setStatus(`It's <strong class="text-yellow-300 mx-1">${nextPlayer.fullName}'s</strong> turn.`);
+      setStatus(`It's <strong>${nextPlayer.name}'s</strong> turn.`);
 
       if (nextPlayer.isBot && !gameOver) {
-        await sleep(700);
+        await sleep(750);
         handleRollClick();
       } else {
         document.getElementById('rollBtn').disabled = false;
@@ -1165,510 +987,17 @@
 
     function resetGame() {
       if (isAnimating) return;
-
-      if (mode === 'online' && window.onlineMP.roomCode && typeof window.resetOnlineMatch === 'function') {
-        window.resetOnlineMatch();
-        return;
-      }
-
       currentTurn = 0;
       gameOver = false;
-      document.getElementById('winModal').classList.add('hidden');
-      initPlayers();
-      showDiceFace(5);
-      renderPlayersUI();
-      drawBoard();
-      if (mode === 'online') {
-        document.getElementById('rollBtn').disabled = true;
-        setStatus('🌐 Open the <strong class="text-emerald-400 mx-1">Online Lobby</strong> to find a match!');
-      } else {
-        document.getElementById('rollBtn').disabled = false;
-        setStatus('Tap <strong class="text-yellow-300 mx-1">Roll Dice</strong> or tap the board to start!');
-      }
-    }
-
-    function resetGame() {
-      if (isAnimating) return;
-      currentTurn = 0;
-      gameOver = false;
-      document.getElementById('winModal').classList.add('hidden');
       initPlayers();
       showDiceFace(5);
       renderPlayersUI();
       drawBoard();
       document.getElementById('rollBtn').disabled = false;
-      setStatus('Tap <strong class="text-yellow-300 mx-1">Roll Dice</strong> or tap the board to start!');
+      setStatus('Roll the dice to start climbing to 100!');
     }
 
-    // Clipboard copy helper using document.execCommand('copy') for iframe compatibility
-    function copyPageSource() {
-      const htmlContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-      const tempTextArea = document.createElement('textarea');
-      tempTextArea.value = htmlContent;
-      tempTextArea.style.position = 'fixed';
-      tempTextArea.style.left = '-9999px';
-      document.body.appendChild(tempTextArea);
-      tempTextArea.select();
-      try {
-        document.execCommand('copy');
-        const btn = document.getElementById('copyCodeBtn');
-        btn.textContent = '✅ Copied HTML!';
-        setTimeout(() => {
-          btn.textContent = '📋 Copy HTML for Android';
-        }, 2500);
-      } catch (err) {
-        setStatus('Unable to copy automatically — use the editor copy button.');
-      }
-      document.body.removeChild(tempTextArea);
-    }
-
-    // Start the game on window load
-    window.onload = function () {
-      resetGame();
-    };
-  </script>
-
-  <!-- ========================================== -->
-  <!-- FIREBASE REAL-TIME ONLINE MULTIPLAYER      -->
-  <!-- ========================================== -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'snakes-ladders-play-games';
-    let db = null;
-    let auth = null;
-    let currentUser = null;
-    let unsubscribeRoom = null;
-
-    const PLAYER_COLORS = ['#ef4444', '#f59e0b', '#10b981', '#a855f7'];
-
-    function setLobbyError(msg) {
-      const el = document.getElementById('lobbyErrorMsg');
-      if (el) el.textContent = msg;
-    }
-
-    // Compute exact deterministic final square for a turn so all clients stay 100% in sync
-    function computeTurnOutcome(currentPlayers, turnIdx, roll) {
-      const updated = currentPlayers.map(p => ({ ...p }));
-      const active = updated[turnIdx];
-      if (!active) return { players: updated, nextTurn: 0, winnerName: null };
-
-      if (active.sq + roll <= 100) {
-        let dest = active.sq + roll;
-        const lad = LADDERS.find(l => l.from === dest);
-        if (lad) dest = lad.to;
-        const snk = SNAKES.find(s => s.from === dest);
-        if (snk) dest = snk.to;
-
-        active.sq = dest;
-
-        // Knockback rule on squares 2..99
-        if (dest > 1 && dest < 100) {
-          updated.forEach((other, idx) => {
-            if (idx !== turnIdx && other.sq === dest) {
-              other.sq = 1;
-            }
-          });
-        }
-      }
-
-      const won = active.sq === 100;
-      const nextTurn = (won || roll === 6) ? turnIdx : ((turnIdx + 1) % updated.length);
-      return {
-        players: updated,
-        nextTurn,
-        winnerName: won ? active.name : null
-      };
-    }
-
-    async function initFirebaseMultiplayer() {
-      try {
-        if (typeof __firebase_config === 'undefined' || !__firebase_config) {
-          setLobbyError('Online mode requires cloud configuration.');
-          return;
-        }
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const app = initializeApp(firebaseConfig);
-        db = getFirestore(app);
-        auth = getAuth(app);
-
-        // Set default gamer tag
-        const randomTag = 'Gamer_' + Math.floor(1000 + Math.random() * 9000);
-        const tagInput = document.getElementById('gamerTagInput');
-        if (tagInput && !tagInput.value) tagInput.value = randomTag;
-
-        // RULE 3: Authenticate first before any Firestore calls
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          await signInWithCustomToken(auth, __initial_auth_token);
-        } else {
-          await signInAnonymously(auth);
-        }
-
-        onAuthStateChanged(auth, (user) => {
-          currentUser = user;
-          if (user) {
-            window.onlineMP.isConnected = true;
-            window.onlineMP.userId = user.uid;
-            const idEl = document.getElementById('myUserIdDisplay');
-            if (idEl) idEl.textContent = user.uid;
-          }
-        });
-      } catch (err) {
-        console.error('Firebase init error:', err);
-        setLobbyError('Could not connect to Play Games network.');
-      }
-    }
-
-    function getGamerTag() {
-      const input = document.getElementById('gamerTagInput');
-      const val = (input?.value || '').trim();
-      return val || ('Gamer_' + Math.floor(1000 + Math.random() * 9000));
-    }
-
-    function getRoomDocRef(roomCode) {
-      // RULE 1: Strict public collection path
-      return doc(db, 'artifacts', appId, 'public', 'data', 'snakes_rooms', roomCode);
-    }
-
-    function getRoomsCollectionRef() {
-      return collection(db, 'artifacts', appId, 'public', 'data', 'snakes_rooms');
-    }
-
-    function subscribeToRoom(roomCode) {
-      if (!currentUser || !db) return;
-      if (unsubscribeRoom) unsubscribeRoom();
-
-      window.onlineMP.roomCode = roomCode;
-      const roomRef = getRoomDocRef(roomCode);
-
-      unsubscribeRoom = onSnapshot(roomRef, async (snapshot) => {
-        if (!snapshot.exists()) {
-          setLobbyError('Room was closed.');
-          leaveOnlineRoom();
-          return;
-        }
-
-        const data = snapshot.data();
-        window.onlineMP.roomData = data;
-        updateLobbyRoomUI(roomCode, data);
-
-        // Animate incoming turn roll if new actionId arrived
-        if (data.lastAction && data.lastAction.actionId && data.lastAction.actionId !== window.onlineMP.lastAnimatedActionId) {
-          const isInitial = window.onlineMP.lastAnimatedActionId === null && data.lastAction.actionId === 'init';
-          window.onlineMP.lastAnimatedActionId = data.lastAction.actionId;
-
-          if (!isInitial && mode === 'online') {
-            closeOnlineLobbyModal();
-            await executeTurnAnimation(data.lastAction.turnIdx, data.lastAction.roll);
-          }
-        }
-
-        // Sync board positions after animation
-        if (!isAnimating && mode === 'online') {
-          currentTurn = data.currentTurn || 0;
-          gameOver = data.status === 'finished';
-          initPlayers();
-          renderPlayersUI();
-          drawBoard();
-
-          if (data.status === 'finished' && data.winnerName) {
-            document.getElementById('winTitle').textContent = `${data.winnerName} Wins!`;
-            document.getElementById('winModal').classList.remove('hidden');
-          } else {
-            document.getElementById('winModal').classList.add('hidden');
-          }
-
-          updateOnlineTurnControls();
-        }
-      }, (err) => {
-        console.error('Room snapshot error:', err);
-        setLobbyError('Lost connection to room.');
-      });
-    }
-
-    function updateLobbyRoomUI(roomCode, data) {
-      document.getElementById('lobbyBrowserSection')?.classList.add('hidden');
-      const activeSec = document.getElementById('activeRoomSection');
-      activeSec?.classList.remove('hidden');
-      activeSec?.classList.add('flex');
-
-      document.getElementById('activeRoomCodeDisplay').textContent = roomCode;
-      const rPlayers = data.players || [];
-      document.getElementById('roomPlayerCount').textContent = rPlayers.length;
-
-      const statusBadge = document.getElementById('roomStatusBadge');
-      if (statusBadge) {
-        statusBadge.textContent = data.status === 'playing' ? '🟢 In Progress' : (data.status === 'finished' ? '🏆 Finished' : '⏳ Waiting for Players');
-      }
-
-      const bannerText = `Room ${roomCode} (${rPlayers.length}/4)`;
-      const mText = document.getElementById('onlineRoomTextMobile');
-      const dText = document.getElementById('onlineRoomTextDesktop');
-      if (mText) mText.textContent = bannerText;
-      if (dText) dText.textContent = bannerText;
-
-      const listEl = document.getElementById('roomPlayersList');
-      if (listEl) {
-        listEl.innerHTML = rPlayers.map((p, idx) => `
-          <div class="flex items-center justify-between bg-stone-900 px-3 py-1.5 rounded-lg border border-stone-800">
-            <div class="flex items-center gap-2">
-              <span class="w-3 h-3 rounded-full border border-white" style="background:${p.color}"></span>
-              <span class="text-xs font-bold text-white">${p.name} ${p.uid === currentUser?.uid ? '<span class="text-emerald-400">(You)</span>' : ''}</span>
-            </div>
-            <span class="text-[10px] font-mono text-stone-400">${idx === 0 ? '👑 Host' : 'Ready'}</span>
-          </div>
-        `).join('');
-      }
-
-      // Show Start Match button if Host and >= 2 players in waiting status
-      const startBtn = document.getElementById('startOnlineMatchBtn');
-      if (startBtn) {
-        const isHost = data.hostUid === currentUser?.uid;
-        const canStart = isHost && data.status === 'waiting' && rPlayers.length >= 2;
-        startBtn.classList.toggle('hidden', !canStart);
-      }
-    }
-
-    window.createOnlineRoom = async function(isPublic = false) {
-      if (!currentUser || !db) {
-        setLobbyError('Connecting to server, please wait a moment...');
-        return;
-      }
-      setLobbyError('');
-      const roomCode = Math.random().toString(36).substring(2, 7).toUpperCase();
-      const myName = getGamerTag();
-
-      const roomData = {
-        roomCode,
-        isPublic,
-        status: 'waiting',
-        hostUid: currentUser.uid,
-        currentTurn: 0,
-        createdAt: Date.now(),
-        winnerName: null,
-        lastAction: { actionId: 'init', turnIdx: 0, roll: 5 },
-        players: [
-          {
-            uid: currentUser.uid,
-            name: myName,
-            color: PLAYER_COLORS[0],
-            sq: 1
-          }
-        ]
-      };
-
-      try {
-        await setDoc(getRoomDocRef(roomCode), roomData);
-        window.onlineMP.lastAnimatedActionId = 'init';
-        subscribeToRoom(roomCode);
-      } catch (e) {
-        console.error(e);
-        setLobbyError('Could not create room.');
-      }
-    };
-
-    window.joinOnlineRoomByCode = async function(codeOverride) {
-      if (!currentUser || !db) {
-        setLobbyError('Still connecting to Play Games...');
-        return;
-      }
-      setLobbyError('');
-      const rawCode = codeOverride || document.getElementById('roomCodeInput')?.value || '';
-      const roomCode = rawCode.trim().toUpperCase();
-      if (!roomCode) {
-        setLobbyError('Enter a valid room code.');
-        return;
-      }
-
-      try {
-        const roomRef = getRoomDocRef(roomCode);
-        const snap = await getDoc(roomRef);
-        if (!snap.exists()) {
-          setLobbyError(`Room "${roomCode}" not found.`);
-          return;
-        }
-
-        const data = snap.data();
-        const rPlayers = data.players || [];
-        const alreadyIn = rPlayers.some(p => p.uid === currentUser.uid);
-
-        if (!alreadyIn) {
-          if (data.status !== 'waiting' || rPlayers.length >= 4) {
-            setLobbyError('Room is full or already in progress.');
-            return;
-          }
-          const myName = getGamerTag();
-          const newPlayer = {
-            uid: currentUser.uid,
-            name: myName,
-            color: PLAYER_COLORS[rPlayers.length % 4],
-            sq: 1
-          };
-          const updatedPlayers = [...rPlayers, newPlayer];
-          // Auto-start if public room reaches 2 players
-          const newStatus = (data.isPublic && updatedPlayers.length >= 2) ? 'playing' : data.status;
-
-          await updateDoc(roomRef, {
-            players: updatedPlayers,
-            status: newStatus
-          });
-        }
-
-        window.onlineMP.lastAnimatedActionId = data.lastAction?.actionId || 'init';
-        subscribeToRoom(roomCode);
-      } catch (e) {
-        console.error(e);
-        setLobbyError('Failed to join room.');
-      }
-    };
-
-    window.quickMatchOnline = async function() {
-      if (!currentUser || !db) {
-        setLobbyError('Connecting to network...');
-        return;
-      }
-      setLobbyError('Searching for open rooms...');
-      try {
-        // RULE 2: Simple collection fetch, filter in memory
-        const snap = await getDocs(getRoomsCollectionRef());
-        let openRoomCode = null;
-
-        snap.forEach(docSnap => {
-          const d = docSnap.data();
-          const pList = d.players || [];
-          const isRecent = (Date.now() - (d.createdAt || 0)) < 1000 * 60 * 30;
-          if (d.status === 'waiting' && pList.length > 0 && pList.length < 4 && isRecent) {
-            openRoomCode = d.roomCode;
-          }
-        });
-
-        if (openRoomCode) {
-          await window.joinOnlineRoomByCode(openRoomCode);
-          setLobbyError('');
-        } else {
-          await window.createOnlineRoom(true);
-          setLobbyError('Created an open room! Waiting for an opponent to join...');
-        }
-      } catch (e) {
-        console.error(e);
-        setLobbyError('Quick match error.');
-      }
-    };
-
-    window.startOnlineMatch = async function() {
-      const code = window.onlineMP.roomCode;
-      if (!currentUser || !db || !code) return;
-      try {
-        await updateDoc(getRoomDocRef(code), {
-          status: 'playing',
-          currentTurn: 0
-        });
-        closeOnlineLobbyModal();
-      } catch (e) {
-        console.error(e);
-      }
-    };
-
-    window.leaveOnlineRoom = function() {
-      if (unsubscribeRoom) {
-        unsubscribeRoom();
-        unsubscribeRoom = null;
-      }
-      window.onlineMP.roomCode = null;
-      window.onlineMP.roomData = null;
-      window.onlineMP.lastAnimatedActionId = null;
-
-      document.getElementById('lobbyBrowserSection')?.classList.remove('hidden');
-      const activeSec = document.getElementById('activeRoomSection');
-      activeSec?.classList.add('hidden');
-      activeSec?.classList.remove('flex');
-
-      const mText = document.getElementById('onlineRoomTextMobile');
-      const dText = document.getElementById('onlineRoomTextDesktop');
-      if (mText) mText.textContent = 'Not in Room';
-      if (dText) dText.textContent = 'Not in Room';
-
-      initPlayers();
-      renderPlayersUI();
-      drawBoard();
-      setStatus('Left online room. Join or create a new match in the Lobby!');
-    };
-
-    window.triggerOnlineRoll = async function() {
-      const code = window.onlineMP.roomCode;
-      const rData = window.onlineMP.roomData;
-      if (!currentUser || !db || !code || !rData || rData.status !== 'playing') return;
-
-      const turnIdx = rData.currentTurn || 0;
-      const activePlayer = (rData.players || [])[turnIdx];
-      if (!activePlayer || activePlayer.uid !== currentUser.uid) return;
-
-      document.getElementById('rollBtn').disabled = true;
-      const roll = Math.floor(Math.random() * 6) + 1;
-      const actionId = `${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
-
-      const outcome = computeTurnOutcome(rData.players, turnIdx, roll);
-
-      try {
-        await updateDoc(getRoomDocRef(code), {
-          players: outcome.players,
-          currentTurn: outcome.nextTurn,
-          status: outcome.winnerName ? 'finished' : 'playing',
-          winnerName: outcome.winnerName || null,
-          lastAction: {
-            actionId,
-            turnIdx,
-            roll
-          }
-        });
-      } catch (e) {
-        console.error('Online roll write failed:', e);
-        document.getElementById('rollBtn').disabled = false;
-      }
-    };
-
-    window.resetOnlineMatch = async function() {
-      const code = window.onlineMP.roomCode;
-      const rData = window.onlineMP.roomData;
-      if (!currentUser || !db || !code || !rData) return;
-
-      const resetPlayers = (rData.players || []).map(p => ({ ...p, sq: 1 }));
-      try {
-        await updateDoc(getRoomDocRef(code), {
-          players: resetPlayers,
-          currentTurn: 0,
-          status: 'playing',
-          winnerName: null,
-          lastAction: { actionId: 'reset_' + Date.now(), turnIdx: 0, roll: 5 }
-        });
-      } catch (e) {
-        console.error(e);
-      }
-    };
-
-    window.copyRoomCode = function() {
-      const code = window.onlineMP.roomCode;
-      if (!code) return;
-      const temp = document.createElement('textarea');
-      temp.value = code;
-      temp.style.position = 'fixed';
-      temp.style.left = '-9999px';
-      document.body.appendChild(temp);
-      temp.select();
-      try {
-        document.execCommand('copy');
-        const btn = document.getElementById('copyRoomBtn');
-        if (btn) {
-          btn.textContent = '✅ Copied';
-          setTimeout(() => { btn.textContent = '📋 Copy'; }, 2000);
-        }
-      } catch (e) {}
-      document.body.removeChild(temp);
-    };
-
-    initFirebaseMultiplayer();
+    resetGame();
   </script>
 </body>
 </html>
