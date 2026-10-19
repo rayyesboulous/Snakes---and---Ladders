@@ -1,7 +1,7 @@
 {
   "name": "Snakes & Ladders",
   "short_name": "Snakes & Ladders",
-  "start_url": "/Snakes---and---Ladders/",
+  "start_url": "/Snakes---and---Ladders/index.html",
   "display": "standalone",
   "background_color": "#202124",
   "theme_color": "#202124",
