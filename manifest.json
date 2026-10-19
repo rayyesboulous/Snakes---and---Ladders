@@ -8,7 +8,7 @@
   "theme_color": "#202124",
   "icons": [
     {
-      "src": "/Snakes---and---Ladders/icon.svg",
+      "src": "https://raw.githubusercontent.com/rayyesboulous/Snakes---and---Ladders/main/icon.svg",
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"
