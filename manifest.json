@@ -3,14 +3,15 @@
   "short_name": "Snakes & Ladders",
   "start_url": "/Snakes---and---Ladders/",
   "display": "standalone",
-  "background_color": "#262322",
-  "theme_color": "#262322",
+  "background_color": "#202124",
+  "theme_color": "#202124",
   "icons": [
     {
-      "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%23111'/><path d='M140 380 C 140 220, 380 280, 380 140 C 380 80, 280 80, 260 120' stroke='%23fff' stroke-width='48' fill='none' stroke-linecap='round'/><circle cx='250' cy='110' r='18' fill='%23fff'/><path d='M100 420 L420 100 M130 450 L450 130' stroke='%23fff' stroke-width='24' stroke-linecap='round'/><path d='M120 400 L380 140 M160 440 L420 180 M200 480 L460 220 M240 360 L300 300 M280 400 L340 340 M320 440 L380 380' stroke='%23fff' stroke-width='16'/></svg>",
+      "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='bg' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%231e78b4'/><stop offset='100%' stop-color='%231b3644'/></linearGradient><linearGradient id='sk' x1='0%' y1='0%' x2='100%' y2='0%'><stop offset='0%' stop-color='%2322c55e'/><stop offset='100%' stop-color='%2316a34a'/></linearGradient></defs><rect width='512' height='512' rx='110' fill='url(%23bg)'/><g transform='rotate(-15 256 256)'><path d='M170 60 L170 450 M342 60 L342 450' stroke='%23f59e0b' stroke-width='20' stroke-linecap='round'/><path d='M170 110 H342 M170 180 H342 M170 250 H342 M170 320 H342 M170 390 H342' stroke='%23fbbf24' stroke-width='14' stroke-linecap='round'/></g><path d='M 80 400 Q 180 450 250 300 T 320 180 Q 380 90 440 120' stroke='url(%23sk)' stroke-width='48' fill='none' stroke-linecap='round'/><circle cx='420' cy='100' r='16' fill='%23fff'/><circle cx='425' cy='98' r='7' fill='%23111'/><circle cx='455' cy='125' r='14' fill='%23fff'/><circle cx='458' cy='124' r='6' fill='%23111'/><path d='M 455 145 Q 480 155 490 140 M 475 152 L 488 162' stroke='%23ef4444' stroke-width='6' fill='none' stroke-linecap='round'/></svg>",
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
   ]
 }
+
