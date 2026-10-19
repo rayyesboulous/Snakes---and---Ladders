@@ -8,7 +8,7 @@
   "theme_color": "#202124",
   "icons": [
     {
-      "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='110' fill='%23ffffff'/><path d='M170 60 L170 450 M342 60 L342 450' stroke='%23000000' stroke-width='20' stroke-linecap='round'/><path d='M170 110 H342 M170 180 H342 M170 250 H342 M170 320 H342 M170 390 H342' stroke='%23000000' stroke-width='14' stroke-linecap='round'/><path d='M 80 400 Q 180 450 250 300 T 320 180 Q 380 90 440 120' stroke='%23000000' stroke-width='48' fill='none' stroke-linecap='round'/><circle cx='420' cy='100' r='16' fill='%23ffffff'/><circle cx='425' cy='98' r='7' fill='%23000000'/></svg>",
+      "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%23202124'/><g transform='scale(0.8) translate(51,51)'><path d='M170 60 L170 450 M342 60 L342 450' stroke='%23f59e0b' stroke-width='20' stroke-linecap='round'/><path d='M170 110 H342 M170 180 H342 M170 250 H342 M170 320 H342 M170 390 H342' stroke='%23fbbf24' stroke-width='14' stroke-linecap='round'/><path d='M 80 400 Q 180 450 250 300 T 320 180 Q 380 90 440 120' stroke='%2322c55e' stroke-width='48' fill='none' stroke-linecap='round'/><circle cx='420' cy='100' r='16' fill='%23ffffff'/><circle cx='425' cy='98' r='7' fill='%23111111'/></g></svg>",
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"
