@@ -8,9 +8,9 @@
   "theme_color": "#202124",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3408/3408595.png",
+      "src": "/Snakes---and---Ladders/icon.svg",
       "sizes": "512x512",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     }
   ]
