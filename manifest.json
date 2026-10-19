@@ -7,9 +7,10 @@
   "theme_color": "#262322",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3408/3408595.png",
+      "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%23111'/><path d='M140 380 C 140 220, 380 280, 380 140 C 380 80, 280 80, 260 120' stroke='%23fff' stroke-width='48' fill='none' stroke-linecap='round'/><circle cx='250' cy='110' r='18' fill='%23fff'/><path d='M100 420 L420 100 M130 450 L450 130' stroke='%23fff' stroke-width='24' stroke-linecap='round'/><path d='M120 400 L380 140 M160 440 L420 180 M200 480 L460 220 M240 360 L300 300 M280 400 L340 340 M320 440 L380 380' stroke='%23fff' stroke-width='16'/></svg>",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
   ]
 }
